@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PharmaStock - Controle de Estoque Farmacêutico</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <i class="fa-solid fa-prescription-bottle-medical brand-icon"></i>
+            <h2>PharmaStock</h2>
+        </div>
+        <nav class="sidebar-menu">
+            <button class="menu-item active" onclick="switchTab('dashboard')">
+                <i class="fa-solid fa-chart-line"></i> Dashboard
+            </button>
+            <button class="menu-item" onclick="switchTab('produtos')">
+                <i class="fa-solid fa-pills"></i> Medicamentos & Insumos
+            </button>
+            <button class="menu-item" onclick="switchTab('fornecedores')">
+                <i class="fa-solid fa-truck-ramp-box"></i> Fornecedores
+            </button>
+            <button class="menu-item" onclick="switchTab('movimentacoes')">
+                <i class="fa-solid fa-right-left"></i> Movimentações
+            </button>
+        </nav>
+        <div class="sidebar-footer">
+            <p><i class="fa-solid fa-shield-halved"></i> Em conformidade com a Anvisa</p>
+        </div>
+    </aside>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="main-content">
+        
+        <!-- HEADER -->
+        <header class="main-header">
+            <div class="header-title">
+                <h1 id="page-title">Dashboard Operacional</h1>
+                <p id="page-subtitle">Visão geral do controle de qualidade e estoque em tempo real (Ano Base: 2026)</p>
+            </div>
+            <div class="header-user">
+                <i class="fa-regular fa-bell alert-bell" onclick="switchTab('produtos')"></i>
+                <div class="user-info">
+                    <span class="user-name">Farmacêutico RT</span>
+                    <span class="user-role">Responsável Técnico</span>
+                </div>
+                <img src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=100&h=100&q=80" alt="Avatar" class="user-avatar">
+            </div>
+        </header>
+
+        <!-- CONTAINER DOS CONTEÚDOS DAS ABAS -->
+        <div class="content-container">
+
+            <!-- ABA: DASHBOARD -->
+            <section id="tab-dashboard" class="tab-content active">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon bg-blue">
+                            <i class="fa-solid fa-box-archive"></i>
+                        </div>
+                        <div class="stat-details">
+                            <h3 id="stat-total-produtos">0</h3>
+                            <p>Medicamentos Cadastrados</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon bg-yellow">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        </div>
+                        <div class="stat-details">
+                            <h3 id="stat-estoque-critico" class="text-yellow">0</h3>
+                            <p>Itens com Estoque Baixo</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon bg-red">
+                            <i class="fa-solid fa-hourglass-end"></i>
+                        </div>
+                        <div class="stat-details">
+                            <h3 id="stat-vencidos" class="text-red">0</h3>
+                            <p>Itens Vencidos / Próximos</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon bg-green">
+                            <i class="fa-solid fa-handshake"></i>
+                        </div>
+                        <div class="stat-details">
+                            <h3 id="stat-fornecedores">0</h3>
+                            <p>Fornecedores Parceiros</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- GRIDS ADICIONAIS DO DASHBOARD -->
+                <div class="dashboard-details-grid">
+                    <div class="dashboard-panel">
+                        <div class="panel-header">
+                            <h3><i class="fa-solid fa-bell text-red"></i> Alertas Críticos de Validade (Anvisa RDC)</h3>
+                        </div>
+                        <div class="panel-body">
+                            <table class="data-table compact-table">
+                                <thead>
+                                    <tr>
+                                        <th>Medicamento</th>
+                                        <th>Lote</th>
+                                        <th>Validade</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-alertas-validade">
+                                    <!-- Dinâmico -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-panel">
+                        <div class="panel-header">
+                            <h3><i class="fa-solid fa-clock-rotate-left"></i> Últimas Movimentações de Lotes</h3>
+                        </div>
+                        <div class="panel-body">
+                            <table class="data-table compact-table">
+                                <thead>
+                                    <tr>
+                                        <th>Data/Hora</th>
+                                        <th>Medicamento</th>
+                                        <th>Tipo</th>
+                                        <th>Qtd</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-ultimas-movimentacoes">
+                                    <!-- Dinâmico -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ABA: MEDICAMENTOS (PRODUTOS) -->
+            <section id="tab-produtos" class="tab-content">
+                <div class="action-bar">
+                    <div class="search-box">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="search-produtos" placeholder="Buscar medicamento ou princípio ativo..." oninput="filtrarProdutos()">
+                    </div>
+                    <button class="btn btn-primary" onclick="abrirModal('modal-produto')">
+                        <i class="fa-solid fa-plus"></i> Novo Medicamento
+                    </button>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Medicamento</th>
+                                <th>Princípio Ativo</th>
+                                <th>Lote</th>
+                                <th>Validade</th>
+                                <th>Estoque</th>
+                                <th>Preço Unitário</th>
+                                <th>Fornecedor</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-produtos-body">
+                            <!-- Dinâmico -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+
+            <!-- ABA: FORNECEDORES -->
+            <section id="tab-fornecedores" class="tab-content">
+                <div class="action-bar">
+                    <div class="search-box">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="search-fornecedores" placeholder="Buscar por Razão Social ou CNPJ..." oninput="filtrarFornecedores()">
+                    </div>
+                    <button class="btn btn-primary" onclick="abrirModal('modal-fornecedor')">
+                        <i class="fa-solid fa-plus"></i> Novo Fornecedor
+                    </button>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nome Fantasia</th>
+                                <th>Razão Social</th>
+                                <th>CNPJ</th>
+                                <th>Telefone</th>
+                                <th>E-mail</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-fornecedores-body">
+                            <!-- Dinâmico -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+
+            <!-- ABA: MOVIMENTAÇÕES -->
+            <section id="tab-movimentacoes" class="tab-content">
+                <div class="action-bar">
+                    <div class="search-box">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="search-movimentacoes" placeholder="Buscar por medicamento..." oninput="filtrarMovimentacoes()">
+                    </div>
+                    <button class="btn btn-primary" onclick="abrirModal('modal-movimentacao')">
+                        <i class="fa-solid fa-right-left"></i> Registrar Entrada/Saída
+                    </button>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Data/Hora</th>
+                                <th>Medicamento/Insumo</th>
+                                <th>Lote</th>
+                                <th>Tipo</th>
+                                <th>Quantidade</th>
+                                <th>Motivo / Justificativa</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-movimentacoes-body">
+                            <!-- Dinâmico -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- MODAL: NOVO MEDICAMENTO/PRODUTO -->
+    <div id="modal-produto" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2><i class="fa-solid fa-prescription-bottle-medical"></i> Cadastrar Medicamento / Insumo</h2>
+                <button class="close-btn" onclick="fecharModal('modal-produto')">&times;</button>
+            </div>
+            <form id="form-produto" onsubmit="salvarProduto(event)">
+                <div class="form-group">
+                    <label for="p-nome">Nome Comercial do Medicamento *</label>
+                    <input type="text" id="p-nome" placeholder="Ex: Paracetamol 750mg" required>
+                </div>
+                <div class="form-group">
+                    <label for="p-principio">Princípio Ativo *</label>
+                    <input type="text" id="p-principio" placeholder="Ex: Paracetamol" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-6">
+                        <label for="p-lote">Número do Lote (Anvisa) *</label>
+                        <input type="text" id="p-lote" placeholder="Ex: PR750-X12" required>
+                    </div>
+                    <div class="form-group col-6">
+                        <label for="p-validade">Data de Validade *</label>
+                        <input type="date" id="p-validade" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-4">
+                        <label for="p-estoque">Estoque Inicial *</label>
+                        <input type="number" id="p-estoque" min="0" value="0" required>
+                    </div>
+                    <div class="form-group col-4">
+                        <label for="p-minimo">Estoque Mínimo *</label>
+                        <input type="number" id="p-minimo" min="1" value="10" required>
+                    </div>
+                    <div class="form-group col-4">
+                        <label for="p-preco">Preço Unitário (R$) *</label>
+                        <input type="number" id="p-preco" step="0.01" min="0.01" placeholder="0.00" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="p-fornecedor">Fornecedor Associado *</label>
+                    <select id="p-fornecedor" required>
+                        <!-- Dinâmico -->
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="fecharModal('modal-produto')">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Gravar Medicamento</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: NOVO FORNECEDOR -->
+    <div id="modal-fornecedor" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2><i class="fa-solid fa-truck-ramp-box"></i> Cadastrar Fornecedor Homologado</h2>
+                <button class="close-btn" onclick="fecharModal('modal-fornecedor')">&times;</button>
+            </div>
+            <form id="form-fornecedor" onsubmit="salvarFornecedor(event)">
+                <div class="form-group">
+                    <label for="f-nome">Nome Fantasia *</label>
+                    <input type="text" id="f-nome" placeholder="Ex: MedSul Distribuidora" required>
+                </div>
+                <div class="form-group">
+                    <label for="f-razao">Razão Social *</label>
+                    <input type="text" id="f-razao" placeholder="Ex: MedSul Distribuidora de Medicamentos Ltda" required>
+                </div>
+                <div class="form-group">
+                    <label for="f-cnpj">CNPJ (Apenas números ou formatado) *</label>
+                    <input type="text" id="f-cnpj" placeholder="Ex: 00.000.000/0001-00" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-6">
+                        <label for="f-tel">Telefone Comercial</label>
+                        <input type="text" id="f-tel" placeholder="Ex: (11) 99999-9999">
+                    </div>
+                    <div class="form-group col-6">
+                        <label for="f-email">E-mail de Contato</label>
+                        <input type="email" id="f-email" placeholder="Ex: comercial@medsul.com">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="f-endereco">Endereço Completo</label>
+                    <input type="text" id="f-endereco" placeholder="Ex: Rua, Número, Bairro, Cidade/UF">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="fecharModal('modal-fornecedor')">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Gravar Fornecedor</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: REGISTRAR MOVIMENTAÇÃO -->
+    <div id="modal-movimentacao" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2><i class="fa-solid fa-right-left"></i> Registrar Movimentação de Estoque</h2>
+                <button class="close-btn" onclick="fecharModal('modal-movimentacao')">&times;</button>
+            </div>
+            <form id="form-movimentacao" onsubmit="salvarMovimentacao(event)">
+                <div class="form-group">
+                    <label for="m-produto">Selecionar Medicamento/Insumo *</label>
+                    <select id="m-produto" required>
+                        <!-- Dinâmico -->
+                    </select>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-6">
+                        <label for="m-tipo">Tipo de Operação *</label>
+                        <select id="m-tipo" required>
+                            <option value="ENTRADA">ENTRADA (+)</option>
+                            <option value="SAIDA">SAIDA (-)</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-6">
+                        <label for="m-qtd">Quantidade de Itens *</label>
+                        <input type="number" id="m-qtd" min="1" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="m-motivo">Justificativa / Motivo da Operação *</label>
+                    <input type="text" id="m-motivo" placeholder="Ex: Compra direta, Venda, Descarte por validade vencida" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="fecharModal('modal-movimentacao')">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Registrar Operação</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
