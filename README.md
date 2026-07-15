@@ -74,6 +74,7 @@ Para acoplar o sistema à infraestrutura de servidores relacionais da empresa fa
 ---
 
 ## 👥 Membros do Grupo (TCC)
-- **Candidato / Desenvolvedor Principal** - Implementação de Arquitetura, Banco de Dados e Frontend.
+- **Felipe; Celso; Luis; Fernando; Daniel; Arthur**.
 
 *Este repositório cumpre integralmente os requisitos para a entrega da atividade final de Controle de Estoque Corporativo.*
+
